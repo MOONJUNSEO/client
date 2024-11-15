@@ -9,11 +9,16 @@
 </head>
 <body>
     <h1>Google Maps에 위치 표시</h1>
-    <button onclick="requestLocationPermission()">위치 정보 전송</button>
     <div id="map" style="width: 100%; height: 500px;"></div>
 
     <script>
         let map;
+
+        // 페이지 로드 시 실행
+        window.onload = function () {
+            initMap(); // Google Maps 초기화
+            requestLocationPermission(); // 팝업 띄워 동의 여부 확인
+        };
 
         // Google Maps 초기화
         function initMap() {
@@ -21,7 +26,7 @@
                 center: { lat: 37.5665, lng: 126.9780 }, // 기본 중심 서울
                 zoom: 12,
             });
-            loadMarkers();
+            loadMarkers(); // 기존 마커 로드
         }
 
         // 위치 정보 요청 및 전송
@@ -76,9 +81,6 @@
                 console.error('마커 로드 실패:', error);
             }
         }
-
-        // 초기화
-        window.onload = initMap;
     </script>
 </body>
 </html>
