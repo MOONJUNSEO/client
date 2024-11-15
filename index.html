@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>위치 정보 표시</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDxg42U8tFRwVWAk64COW-x5qfApBV6jLs"></script>
+</head>
+<body>
+    <h1>Google Maps에 위치 표시</h1>
+    <button onclick="sendLocation()">현재 위치 전송</button>
+    <div id="map" style="width: 100%; height: 500px;"></div>
+
+    <script>
+        let map;
+
+        function initMap() {
+            map = new google.maps.Map(document.getElementById("map"), {
+                center: { lat: 36.5, lng: 127.5 }, // 기본 중심 서울
+                zoom: 7,
+            });
+            loadMarkers();
+        }
+
+        async function sendLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(async (position) => {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+
+                    // 서버로 위치정보 전송
+                    try {
+                        await axios.post('https://your-cloudtype-app.cloudtype.app/location', {
+                            latitude: lat,
+                            longitude: lng,
+                        });
+                        alert('위치가 서버에 저장되었습니다!');
+                        loadMarkers(); // 새로운 마커 로드
+                    } catch (error) {
+                        console.error('위치 전송 실패:', error);
+                    }
+                });
+            } else {
+                alert('브라우저에서 위치 정보를 지원하지 않습니다.');
+            }
+        }
+
+        async function loadMarkers() {
+            try {
+                const response = await axios.get('https://your-cloudtype-app.cloudtype.app/locations');
+                const locations = response.data;
+
+                locations.forEach((location) => {
+                    new google.maps.Marker({
+                        position: { lat: location.latitude, lng: location.longitude },
+                        map: map,
+                    });
+                });
+            } catch (error) {
+                console.error('마커 로드 실패:', error);
+            }
+        }
+
+        // 초기화
+        window.onload = initMap;
+    </script>
+</body>
+</html>
